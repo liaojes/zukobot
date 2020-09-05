@@ -19,3 +19,8 @@ const app = new App({
 
   console.log(`⚡️ Bolt app is running on ${port}`);
 })();
+
+app.error((error) => {
+  // Check the details of the error to handle special cases (such as stopping the app or retrying the sending of a message)
+  console.error(error);
+});
