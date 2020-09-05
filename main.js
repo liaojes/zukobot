@@ -13,7 +13,8 @@ const app = new App({
 
   //   app.event(eventType, fn);
 
-  app.event("message.app_home", ({ event, say }) => {
+  app.event("message", ({ event, say }) => {
+    console.log(event);
     say(`Hello world, <@${event.user}>!`);
   });
 
