@@ -18,8 +18,6 @@ const app = new App({
 
 receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
 
-app.use("/slack/events", app.receiver.router);
-
 (async () => {
   // Start the app
   const port = process.env.PORT || 3000;
