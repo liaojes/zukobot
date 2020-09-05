@@ -14,8 +14,29 @@ const app = new App({
   //   app.event(eventType, fn);
 
   app.event("message", ({ event, say }) => {
-    console.log(event);
-    say(`Hello world, <@${event.user}>!`);
+    //console.log(event);
+    //say(`Hello world, <@${event.user}>!`);
+    await say({
+        "blocks": [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "Ma, *feed me*"
+                }
+            },
+            {
+                "type": "image",
+                "title": {
+                    "type": "plain_text",
+                    "text": "Ma, *feed me*",
+                    "emoji": true
+                },
+                "image_url": "https://assets3.thrillist.com/v1/image/1682388/size/tl-horizontal_main.jpg",
+                "alt_text": "marg"
+            }
+        ]
+    });
   });
 
   console.log(`⚡️ Bolt app is running on ${port}`);
