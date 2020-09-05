@@ -28,6 +28,8 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
   app.event("message", ({ event, say }) => {
     //console.log(event);
     //say(`Hello world, <@${event.user}>!`);
+    const img = files[Math.floor(Math.random() * files.length)];
+
     say({
       blocks: [
         {
@@ -44,8 +46,7 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
             text: "Ma, *feed me*",
             emoji: true,
           },
-          image_url:
-            "https://assets3.thrillist.com/v1/image/1682388/size/tl-horizontal_main.jpg",
+          image_url: `https://yuchiko-bot.herokuapp.com/static/${img}`,
           alt_text: "marg",
         },
       ],
