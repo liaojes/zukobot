@@ -13,9 +13,9 @@ const app = new App({
 
   //   app.event(eventType, fn);
 
+  app.event("app_home_opened", ({ event, say }) => {
+    say(`Hello world, <@${event.user}>!`);
+  });
+
   console.log(`⚡️ Bolt app is running on ${port}`);
 })();
-
-app.event("app_home_opened", ({ event, say }) => {
-  say(`Hello world, <@${event.user}>!`);
-});
