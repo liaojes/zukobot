@@ -1,25 +1,33 @@
 require("dotenv").config();
 const path = require("path");
+const fs = require("fs");
 const express = require("express");
-const { App } = require("@slack/bolt");
-const app = express();
-app.use("/static", express.static(path.join(__dirname, "pics")));
+const { App, ExpressReceiver } = require("@slack/bolt");
 
-const slackApp = new App({
+const files = fs.readdirSync(path.join(__dirname, "pics"));
+console.log(files);
+
+const receiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
+});
+
+const app = new App({
+  receiver,
   token: process.env.SLACK_BOT_TOKEN,
 });
 
-app.use("/slack/events", slackApp.receiver.router);
+receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
+
+app.use("/slack/events", app.receiver.router);
 
 (async () => {
   // Start the app
   const port = process.env.PORT || 3000;
-  await app.listen(port);
+  await app.start(port);
 
   //   app.event(eventType, fn);
 
-  slackApp.event("message", ({ event, say }) => {
+  app.event("message", ({ event, say }) => {
     //console.log(event);
     //say(`Hello world, <@${event.user}>!`);
     say({
@@ -49,7 +57,7 @@ app.use("/slack/events", slackApp.receiver.router);
   console.log(`⚡️ Bolt app is running on ${port}`);
 })();
 
-slackApp.error((error) => {
+app.error((error) => {
   // Check the details of the error to handle special cases (such as stopping the app or retrying the sending of a message)
   console.error(error);
 });
@@ -64,4 +72,4 @@ async function logEvent({ payload, context, next }) {
   console.log(`Total processing time: ${endTimeMs - startTimeMs}`);
 }
 
-slackApp.use(logEvent);
+app.use(logEvent);
