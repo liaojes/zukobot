@@ -1,19 +1,25 @@
 require("dotenv").config();
+const path = require("path");
+const express = require("express");
 const { App } = require("@slack/bolt");
+const app = express();
+app.use("/static", express.static(path.join(__dirname, "pics")));
 
-const app = new App({
+const slackApp = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   token: process.env.SLACK_BOT_TOKEN,
 });
 
+app.use("/slack/events", slackApp.receiver.router);
+
 (async () => {
   // Start the app
   const port = process.env.PORT || 3000;
-  await app.start(port);
+  await app.listen(port);
 
   //   app.event(eventType, fn);
 
-  app.event("message", ({ event, say }) => {
+  slackApp.event("message", ({ event, say }) => {
     //console.log(event);
     //say(`Hello world, <@${event.user}>!`);
     say({
@@ -43,7 +49,7 @@ const app = new App({
   console.log(`⚡️ Bolt app is running on ${port}`);
 })();
 
-app.error((error) => {
+slackApp.error((error) => {
   // Check the details of the error to handle special cases (such as stopping the app or retrying the sending of a message)
   console.error(error);
 });
@@ -58,4 +64,4 @@ async function logEvent({ payload, context, next }) {
   console.log(`Total processing time: ${endTimeMs - startTimeMs}`);
 }
 
-app.use(logEvent);
+slackApp.use(logEvent);
