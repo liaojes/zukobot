@@ -8,12 +8,13 @@ const app = new App({
 
 (async () => {
   // Start the app
-  await app.start(process.env.PORT || 3000);
+  const port = process.env.PORT || 3000;
+  await app.start(port);
 
   //   app.event(eventType, fn);
   app.event("app_home_opened", ({ event, say }) => {
     say(`Hello world, <@${event.user}>!`);
   });
 
-  console.log("⚡️ Bolt app is running!");
+  console.log(`⚡️ Bolt app is running on ${port}`);
 })();
