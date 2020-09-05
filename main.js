@@ -5,6 +5,9 @@ const express = require("express");
 const { App, ExpressReceiver } = require("@slack/bolt");
 
 const files = fs.readdirSync(path.join(__dirname, "pics"));
+const sayings = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "zukisms.json"))
+);
 console.log(files);
 
 const receiver = new ExpressReceiver({
@@ -28,7 +31,8 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
   app.event("message", ({ event, say }) => {
     //console.log(event);
     //say(`Hello world, <@${event.user}>!`);
-    const img = files[Math.floor(Math.random() * files.length)];
+    const img = randomElement(files);
+    const saying = randomElement(sayings);
 
     say({
       blocks: [
@@ -36,14 +40,14 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "Ma, *feed me*",
+            text: saying,
           },
         },
         {
           type: "image",
           title: {
             type: "plain_text",
-            text: "Ma, *feed me*",
+            text: saying,
             emoji: true,
           },
           image_url: `https://yuchiko-bot.herokuapp.com/static/${img}`,
@@ -72,3 +76,7 @@ async function logEvent({ payload, context, next }) {
 }
 
 app.use(logEvent);
+
+function randomElement(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
