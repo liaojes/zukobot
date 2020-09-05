@@ -26,7 +26,7 @@ app.error((error) => {
 });
 
 async function logEvent({ payload, context, next }) {
-  console.log(`payload: ${payload}\ncontext: ${context}`);
+  console.log("payload:", payload, "\n\ncontext:", context);
   const startTimeMs = Date.now();
 
   await next();
