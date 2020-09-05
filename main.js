@@ -24,3 +24,15 @@ app.error((error) => {
   // Check the details of the error to handle special cases (such as stopping the app or retrying the sending of a message)
   console.error(error);
 });
+
+async function logEvent({ payload, context, next }) {
+  console.log(`payload: ${payload}\ncontext: ${context}`);
+  const startTimeMs = Date.now();
+
+  await next();
+
+  const endTimeMs = Date.now();
+  console.log(`Total processing time: ${endTimeMs - startTimeMs}`);
+}
+
+app.use(logEvent);
