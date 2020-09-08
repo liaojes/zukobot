@@ -7,7 +7,7 @@ module.exports = new EntitySchema({
   target: Ping,
   columns: {
     interval: {
-      type: "text",
+      type: "int",
     },
   },
   relations: {

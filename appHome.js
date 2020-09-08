@@ -13,7 +13,7 @@ const updateView = async (event, ping) => {
       emoji: true,
       text: "Once a day",
     },
-    value: "one",
+    value: "1",
   };
   // Intro message -
   let blocks = [
@@ -65,7 +65,7 @@ const updateView = async (event, ping) => {
               emoji: true,
               text: "Once a day",
             },
-            value: "one",
+            value: "1",
           },
           {
             text: {
@@ -73,7 +73,7 @@ const updateView = async (event, ping) => {
               emoji: true,
               text: "Twice a day",
             },
-            value: "two",
+            value: "2",
           },
           {
             text: {
@@ -81,7 +81,7 @@ const updateView = async (event, ping) => {
               emoji: true,
               text: "Three times a day",
             },
-            value: "three",
+            value: "3",
           },
           {
             text: {
@@ -89,7 +89,7 @@ const updateView = async (event, ping) => {
               emoji: true,
               text: "None",
             },
-            value: "none",
+            value: "0",
           },
         ],
       },

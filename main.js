@@ -5,11 +5,12 @@ const fs = require("fs");
 const express = require("express");
 const appHome = require("./appHome");
 const cron = require("node-cron");
-const { createConnection } = require("typeorm");
+const { createConnection, MoreThan } = require("typeorm");
 const { App, ExpressReceiver } = require("@slack/bolt");
 
 const { User } = require("./models/User");
 const { Ping } = require("./models/Ping");
+const { PingHistory } = require("./models/PingHistory");
 
 const appId = "A01ABCY8TJQ";
 const teamId = "T019X9L8ATB";
@@ -39,12 +40,17 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
     username: "postgres",
     password: process.env.POSTGRES_PASSWORD,
     database: "yukibot",
-    entities: [require("./entity/PingSchema"), require("./entity/UserSchema")],
+    entities: [
+      require("./entity/PingSchema"),
+      require("./entity/UserSchema"),
+      require("./entity/PingHistorySchema"),
+    ],
     synchronize: true,
     logging: true,
   });
 
   const pingRepository = connection.getRepository(Ping);
+  const pingHistoryRepository = connection.getRepository(PingHistory);
   const userRepository = connection.getRepository(User);
 
   // Start the app
@@ -99,7 +105,7 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
     await ack();
 
     // Open a modal window with forms to be submitted by a user
-    console.log("bere");
+    console.log("bere", body.actions[0]);
     const user = await userRepository.find({
       where: {
         id: body.user.id,
@@ -110,7 +116,7 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
 
     const ping = new Ping();
     ping.user = user[0];
-    ping.interval = body.actions[0].selected_option.value;
+    ping.interval = parseInt(body.actions[0].selected_option.value);
 
     await pingRepository.save(ping);
     console.log(body);
@@ -142,16 +148,60 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
     });
   });
 
+  app.command("/zuko", async ({ ack, command, respond }) => {
+    await ack();
+    console.log("HSSSSERE", command);
+    const img = randomElement(files);
+    const saying = randomElement(sayings);
+
+    respond({
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: saying,
+          },
+        },
+        {
+          type: "image",
+          image_url: `https://app.yukichiko.com/static/${img}`,
+          alt_text: "marg",
+        },
+      ],
+    });
+  });
+
   console.log(`⚡️ Bolt app is running on ${port}`);
 
+  // repeats every minute
   cron.schedule("* * * * *", async () => {
     console.log("running a task every minute");
     const client = app.client;
     const pings = await pingRepository.find({ relations: ["user"] });
+
     console.log("PINGS:", pings);
     for (const ping of pings) {
       const user = ping.user;
       console.log(user, ping);
+
+      const now = new Date();
+      now.setDate(now.getDate() - 1);
+      // get all pings in the last 24 hours
+      const pingHistories = await pingHistoryRepository.find({
+        where: { user: { id: user.id }, ts: MoreThan(now) },
+      });
+
+      //if i already pinged this user too many times, continue
+      if (pingHistories.length >= ping.interval) {
+        console.log(
+          `got ${pingHistories.length}, interval: ${ping.interval}. not pinging`
+        );
+        continue;
+      }
+
+      console.log(pingHistories);
+      //send message
       const result = await client.chat.postMessage({
         token: process.env.SLACK_BOT_TOKEN,
         channel: user.channel,
@@ -172,6 +222,12 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
           },
         ],
       });
+
+      //create row in PingHistory
+      const ph = new PingHistory();
+      ph.user = user;
+      ph.ts = new Date();
+      await pingHistoryRepository.save(ph);
       console.log("RESULT", result);
     }
   });
