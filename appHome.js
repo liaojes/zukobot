@@ -15,7 +15,7 @@ const updateView = async (event, ping) => {
     },
     value: "1",
   };
-  // Intro message -
+  // App Home Display
   let blocks = [
     {
       type: "header",
@@ -101,7 +101,7 @@ const updateView = async (event, ping) => {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `:speech_balloon:  *<slack://app?team=${event.view.team_id}&id=${event.view.app_id}&tab=home|Chat me> anytime*  :smiley: \n\nI'm always here for you. Chat me anytime in the <slack://app?team=${event.view.team_id}&id=${event.view.app_id}&tab=home|message tab> and I'll respond with photos of me to brighten your day! :sunny:`,
+        text: `:speech_balloon:  *<slack://app?team=${event.view.team_id}&id=${event.view.app_id}&tab=messages|Chat me> anytime*  :smiley: \n\nI'm always here for you. Chat me anytime in the <slack://app?team=${event.view.team_id}&id=${event.view.app_id}&tab=messages|message tab> and I'll respond with photos of me to brighten your day! :sunny:`,
       },
       accessory: {
         type: "image",

@@ -12,9 +12,6 @@ const { User } = require("./models/User");
 const { Ping } = require("./models/Ping");
 const { PingHistory } = require("./models/PingHistory");
 
-const appId = "A01ABCY8TJQ";
-const teamId = "T019X9L8ATB";
-
 const files = fs.readdirSync(path.join(__dirname, "pics"));
 const sayings = JSON.parse(
   fs.readFileSync(path.join(__dirname, "zukisms.json"))
@@ -85,9 +82,7 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
     ack();
 
     // Open a modal window with forms to be submitted by a user
-    console.log("jere");
     const view = appHome.openModal();
-    console.log("jere2");
 
     try {
       const result = await app.client.views.open({
@@ -150,11 +145,12 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
 
   app.command("/zuko", async ({ ack, command, respond }) => {
     await ack();
-    console.log("HSSSSERE", command);
+    console.log("Slash command received", command);
     const img = randomElement(files);
     const saying = randomElement(sayings);
 
     respond({
+      response_type: "ephemeral",
       blocks: [
         {
           type: "section",
@@ -166,7 +162,6 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
         {
           type: "image",
           image_url: `https://app.yukichiko.com/static/${img}`,
-          alt_text: "marg",
         },
       ],
     });
@@ -200,7 +195,7 @@ receiver.router.use("/static", express.static(path.join(__dirname, "pics")));
         continue;
       }
 
-      console.log(pingHistories);
+      //console.log(pingHistories);
       //send message
       const result = await client.chat.postMessage({
         token: process.env.SLACK_BOT_TOKEN,
